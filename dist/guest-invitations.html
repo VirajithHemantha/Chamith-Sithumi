@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Wedding Invitations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #fdfaf5 0%, #f8f5f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #2c2a26;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #8b7355;
+            font-size: 1.1rem;
+            margin-bottom: 50px;
+            font-weight: 300;
+        }
+        
+        .invitations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .invitation-card {
+            background: linear-gradient(135deg, #fdfaf5 0%, #fff9f2 100%);
+            border: 2px solid #f3a7cd;
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .invitation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(243, 167, 205, 0.3);
+        }
+        
+        .guest-name {
+            font-size: 1.5rem;
+            color: #522540;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .guest-title {
+            color: #8b7355;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .invitation-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #522540 0%, #3b1f2d 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .invitation-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(82, 37, 64, 0.3);
+        }
+        
+        .copy-link {
+            background: #f3a7cd;
+            color: #2c2a26;
+            font-size: 0.85rem;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-link:hover {
+            background: #e8859c;
+        }
+        
+        .url-display {
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #2c2a26;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+        
+        .copied-message {
+            color: #22c55e;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        .instructions {
+            background: #f8f5f0;
+            border-left: 4px solid #f3a7cd;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+            margin-top: 40px;
+        }
+        
+        .instructions h3 {
+            color: #522540;
+            margin-bottom: 10px;
+        }
+        
+        .instructions p {
+            color: #8b7355;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .instructions code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #522540;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Personalized Wedding Invitations</h1>
+        <p class="subtitle">Chamith & Sithumi's Wedding - May 27, 2026</p>
+        
+        <div class="invitations-grid">
+            <div class="invitation-card">
+                <div class="guest-name">Mr. Namal Rajapakshe</div>
+                <div class="guest-title">Valued Guest</div>
+                <button onclick="openInvitation('namalrajapakshe')" class="invitation-link">
+                    Open Invitation
+                </button>
+                <button onclick="copyToClipboard('namalrajapakshe')" class="copy-link">
+                    Copy Link
+                </button>
+                <div class="url-display" id="url-namalrajapakshe">
+                    (Loading URL...)
+                </div>
+                <div class="copied-message" id="copied-namalrajapakshe">✓ Copied to clipboard!</div>
+            </div>
+            
+            <div class="invitation-card">
+                <div class="guest-name">Mr. Dudley Sirisena</div>
+                <div class="guest-title">Valued Guest</div>
+                <button onclick="openInvitation('dudleysirisena')" class="invitation-link">
+                    Open Invitation
+                </button>
+                <button onclick="copyToClipboard('dudleysirisena')" class="copy-link">
+                    Copy Link
+                </button>
+                <div class="url-display" id="url-dudleysirisena">
+                    (Loading URL...)
+                </div>
+                <div class="copied-message" id="copied-dudleysirisena">✓ Copied to clipboard!</div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 How to Use</h3>
+            <p>✓ Each guest has a <strong>personalized invitation link</strong></p>
+            <p>✓ Click <strong>Open Invitation</strong> to view the invitation for that guest</p>
+            <p>✓ Click <strong>Copy Link</strong> to copy the unique URL and share it with the guest</p>
+            <p>✓ Each link automatically personalizes the invitation with the guest's name</p>
+            <h3 style="margin-top: 20px;">🔗 URL Format</h3>
+            <p>Invitations use the format: <code>/?guest=guestid</code></p>
+            <p>Example: <code>/?guest=namalrajapakshe</code></p>
+        </div>
+    </div>
+    
+    <script>
+        // Set the base URL
+        const baseUrl = window.location.origin + window.location.pathname;
+        
+        // Display URLs for each guest
+        document.getElementById('url-namalrajapakshe').textContent = baseUrl + '?guest=namalrajapakshe';
+        document.getElementById('url-dudleysirisena').textContent = baseUrl + '?guest=dudleysirisena';
+        
+        function openInvitation(guestId) {
+            const url = baseUrl + '?guest=' + guestId;
+            window.location.href = url;
+        }
+        
+        function copyToClipboard(guestId) {
+            const urlElement = document.getElementById('url-' + guestId);
+            const url = urlElement.textContent;
+            
+            navigator.clipboard.writeText(url).then(() => {
+                const messageEl = document.getElementById('copied-' + guestId);
+                messageEl.style.display = 'block';
+                
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+    </script>
+</body>
+</html>

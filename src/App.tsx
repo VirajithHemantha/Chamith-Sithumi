@@ -225,117 +225,7 @@ export default function WeddingInvitation() {
     }
   };
 
-  // RSVP Form State
-  const [rsvpData, setRsvpData] = useState({
-    name: "",
-    guests: "1",
-    notes: ""
-  });
-  const [isRsvpSubmitting, setIsRsvpSubmitting] = useState(false);
-  const [rsvpStatus, setRsvpStatus] = useState<"idle" | "success" | "error">("idle");
 
-  // Wishing Form State
-  const [wishData, setWishData] = useState({
-    name: "",
-    message: ""
-  });
-  const [isWishSubmitting, setIsWishSubmitting] = useState(false);
-  const [wishStatus, setWishStatus] = useState<"idle" | "success" | "error">("idle");
-
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXa9vWxTnnQoZtNRkOVpFTkWQZyyRWLZgvr-V6Gps6Qp_TrdjszZZjENazadNMtlVl/exec";
-
-  const sendWhatsAppMessage = (formData: { name: string; guests?: string; message?: string; type: "rsvp" | "wish"; dietaryNotes?: string }) => {
-    const phoneNumber = "94763760532"; // WhatsApp format: country code + number without +
-    let messageText = "";
-
-    if (formData.type === "rsvp") {
-      messageText = `🎉 New RSVP Received!\n\nName: ${formData.name}\nGuests: ${formData.guests}\nDietary Notes: ${formData.dietaryNotes || "None"}\nTime: ${new Date().toLocaleString()}`;
-    } else if (formData.type === "wish") {
-      messageText = `💌 New Wedding Wish!\n\nName: ${formData.name}\nMessage: ${formData.message}\nTime: ${new Date().toLocaleString()}`;
-    }
-
-    try {
-      // Encode message for WhatsApp URL
-      const encodedMessage = encodeURIComponent(messageText);
-      
-      // Open WhatsApp with pre-filled message - user can review and send
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-      window.open(whatsappUrl, "_blank");
-      
-      console.log(`WhatsApp opened for ${formData.type}`);
-    } catch (error) {
-      console.error("WhatsApp error:", error);
-    }
-  };
-
-  const handleRsvpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!rsvpData.name) return;
-    setIsRsvpSubmitting(true);
-    setRsvpStatus("idle");
-
-    try {
-      const params = new URLSearchParams();
-      params.append("sheet", "rsvp");
-      params.append("name", rsvpData.name);
-      params.append("guests", rsvpData.guests);
-      params.append("notes", rsvpData.notes);
-      params.append("date", new Date().toLocaleString());
-
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
-      });
-      setRsvpStatus("success");
-      setRsvpData({ name: "", guests: "1", notes: "" });
-      
-      // Send WhatsApp notification after RSVP success
-      sendWhatsAppMessage({ name: rsvpData.name, guests: rsvpData.guests, dietaryNotes: rsvpData.notes, type: "rsvp" });
-    } catch (error) {
-      console.error("RSVP error:", error);
-      setRsvpStatus("error");
-    } finally {
-      setIsRsvpSubmitting(false);
-    }
-  };
-
-  const handleWishSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!wishData.name || !wishData.message) return;
-    setIsWishSubmitting(true);
-    setWishStatus("idle");
-
-    try {
-      const params = new URLSearchParams();
-      params.append("sheet", "wish");
-      params.append("name", wishData.name);
-      params.append("message", wishData.message);
-      params.append("date", new Date().toLocaleString());
-
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
-      });
-      setWishStatus("success");
-      setWishData({ name: "", message: "" });
-      
-      // Send WhatsApp notification after wish success
-      sendWhatsAppMessage({ name: wishData.name, message: wishData.message, type: "wish" });
-    } catch (error) {
-      console.error("Wish error:", error);
-      setWishStatus("error");
-    } finally {
-      setIsWishSubmitting(false);
-    }
-  };
 
 
 
@@ -369,6 +259,34 @@ export default function WeddingInvitation() {
       connection?.removeEventListener?.("change", updatePerformanceMode);
     };
   }, []);
+
+  const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
+  let inviteText: React.ReactNode = (
+    <>You are cordially invited to<br className="hidden md:block" /> celebrate the union of</>
+  );
+  let heroText: React.ReactNode = "Please join us";
+
+  if (path === '/namalrajapakshe') {
+    inviteText = (
+      <>
+        <span className="block font-playball text-3xl md:text-5xl normal-case tracking-normal text-theme-900 mb-4 md:mb-6 drop-shadow-sm leading-tight">Honorable Namal Rajapakshe,</span>
+        you are cordially invited to<br className="hidden md:block" /> celebrate the union of
+      </>
+    );
+    heroText = (
+      <span className="block font-playball text-xl md:text-3xl normal-case tracking-normal text-theme-900 drop-shadow-sm pb-1">Honorable Namal Rajapakshe</span>
+    );
+  } else if (path === '/dudleysirisena') {
+    inviteText = (
+      <>
+        <span className="block font-playball text-3xl md:text-5xl normal-case tracking-normal text-theme-900 mb-4 md:mb-6 drop-shadow-sm leading-tight">Mr. Dudley Sirisena,</span>
+        we cordially invite you to<br className="hidden md:block" /> celebrate the union of
+      </>
+    );
+    heroText = (
+      <span className="block font-playball text-xl md:text-3xl normal-case tracking-normal text-theme-900 drop-shadow-sm pb-1">Mr. Dudley Sirisena</span>
+    );
+  }
 
   return (
     <main
@@ -415,8 +333,8 @@ export default function WeddingInvitation() {
               <span className="inline-block px-5 py-2 rounded-full bg-theme-50 border border-theme-200 text-[10px] uppercase tracking-[0.5em] text-theme-700 font-bold mb-6">
                 Save the Date
               </span>
-              <h1 className="font-cinzel text-4xl md:text-5xl text-stone-800 mb-4 tracking-tight">
-                Chamith & Sithumi
+              <h1 className="font-cinzel text-xl sm:text-2xl md:text-4xl text-stone-800 mb-4 tracking-tight px-2 md:px-4 text-center leading-snug">
+                Chamith Gamage <br className="sm:hidden" /> <span className="text-theme-500">&amp;</span> <br className="sm:hidden" /> Sithumi Koralage
               </h1>
               <p className="text-stone-500 text-sm tracking-[0.2em] font-light">MAY 27, 2026</p>
             </motion.div>
@@ -593,7 +511,7 @@ export default function WeddingInvitation() {
                     transition={{ delay: 0.8, duration: 1 }}
                   >
                     <span className="block text-[8px] md:text-[10px] uppercase tracking-[0.4em] md:tracking-[0.6em] text-theme-700 font-bold mb-2">
-                      Please join us
+                      {heroText}
                     </span>
                   </motion.div>
 
@@ -602,15 +520,15 @@ export default function WeddingInvitation() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 1, duration: 0.8 }}
-                      className="font-playball text-[3rem] sm:text-[3.5rem] md:text-[5rem] text-stone-800 leading-[1.1] drop-shadow-sm"
+                      className="font-playball text-[2.5rem] sm:text-[3rem] md:text-[4rem] text-stone-800 leading-[1.1] drop-shadow-sm text-center"
                     >
-                      Chamith
+                      Chamith Gamage
                     </motion.h1>
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 1.2, duration: 0.5 }}
-                      className="font-playball text-3xl md:text-5xl text-theme-500 italic font-light my-2 md:my-4 tracking-widest"
+                      className="font-playball text-3xl md:text-5xl text-theme-500 italic font-light my-1 md:my-2 tracking-widest"
                     >
                       &
                     </motion.div>
@@ -618,9 +536,9 @@ export default function WeddingInvitation() {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 1.4, duration: 0.8 }}
-                      className="font-playball text-[3rem] sm:text-[3.5rem] md:text-[5rem] text-stone-800 leading-[1.1] drop-shadow-sm"
+                      className="font-playball text-[2.5rem] sm:text-[3rem] md:text-[4rem] text-stone-800 leading-[1.1] drop-shadow-sm text-center"
                     >
-                      Sithumi
+                      Sithumi Koralage
                     </motion.h1>
                   </div>
 
@@ -685,7 +603,7 @@ export default function WeddingInvitation() {
                 >
                   <div className="w-px h-16 md:h-24 bg-gradient-to-b from-transparent to-theme-400 mb-6 md:mb-10" />
                   <p className="text-theme-700 text-[9px] md:text-[12px] tracking-[0.4em] md:tracking-[0.6em] uppercase font-bold text-center leading-loose">
-                    You are cordially invited to<br className="hidden md:block" /> celebrate the union of
+                    {inviteText}
                   </p>
                 </motion.div>
 
@@ -721,9 +639,9 @@ export default function WeddingInvitation() {
                     <div className="relative z-10 space-y-4 py-8 md:py-12">
                       <div className="space-y-2">
                         <p className="text-[7px] md:text-[8px] uppercase tracking-[0.4em] font-bold text-stone-400">Beloved daughter of</p>
-                        <p className="text-xs md:text-sm font-cinzel text-stone-600 tracking-wide leading-relaxed">Mr & Mrs Gamage</p>
+                        <p className="text-xs md:text-sm font-cinzel text-stone-600 tracking-wide leading-relaxed">Mr & Mrs Koralage</p>
                       </div>
-                      <h3 className="text-5xl md:text-7xl font-playball text-theme-800 group-hover:scale-110 transition-transform duration-700 pt-6 drop-shadow-sm">Sithumi</h3>
+                      <h3 className="text-3xl md:text-4xl font-playball text-theme-800 group-hover:scale-110 transition-transform duration-700 pt-6 drop-shadow-sm">Sithumi Koralage</h3>
                     </div>
                   </motion.div>
 
@@ -755,9 +673,9 @@ export default function WeddingInvitation() {
                     <div className="relative z-10 space-y-4 py-8 md:py-12">
                       <div className="space-y-2">
                         <p className="text-[7px] md:text-[8px] uppercase tracking-[0.4em] font-bold text-stone-400">Beloved son of</p>
-                        <p className="text-xs md:text-sm font-cinzel text-stone-600 tracking-wide leading-relaxed">Mr & Mrs Koralage</p>
+                        <p className="text-xs md:text-sm font-cinzel text-stone-600 tracking-wide leading-relaxed">Mr & Mrs Gamage</p>
                       </div>
-                      <h3 className="text-5xl md:text-7xl font-playball text-theme-800 group-hover:scale-110 transition-transform duration-700 pt-6 drop-shadow-sm">Chamith</h3>
+                      <h3 className="text-3xl md:text-4xl font-playball text-theme-800 group-hover:scale-110 transition-transform duration-700 pt-6 drop-shadow-sm">Chamith Gamage</h3>
                     </div>
                   </motion.div>
                 </div>
@@ -926,104 +844,7 @@ export default function WeddingInvitation() {
               </div>
             </section>
 
-            {/* RSVP Section */}
-            <section className="cv-auto py-24 md:py-36 bg-[#2c2a26] text-white relative overflow-hidden flex flex-col items-center">
-              {/* Opulent dark background */}
-              <div className="absolute inset-0 opacity-10 paper-grain pointer-events-none" />
-              <div className="absolute top-0 right-0 w-[60vw] h-[60vw] max-w-[800px] bg-theme-800 blur-[150px] rounded-full opacity-30 pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-[60vw] h-[60vw] max-w-[800px] bg-theme-900 blur-[150px] rounded-full opacity-40 pointer-events-none" />
 
-              <div className="container mx-auto px-4 max-w-2xl text-center relative z-10 w-full">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="flex flex-col items-center"
-                >
-                  <p className="text-[10px] md:text-[12px] uppercase tracking-[0.5em] md:tracking-[0.8em] text-theme-300 font-bold mb-6">Will You Join Us?</p>
-                  <h2 className="font-playball text-[3.5rem] sm:text-[4rem] md:text-[5.5rem] text-white mb-6 drop-shadow-md">RSVP</h2>
-                  <div className="flex items-center gap-4 justify-center w-full mb-8 opacity-60">
-                    <div className="h-px w-16 md:w-24 bg-gradient-to-r from-transparent to-theme-300" />
-                    <div className="w-1.5 h-1.5 rotate-45 bg-white" />
-                    <div className="h-px w-16 md:w-24 bg-gradient-to-l from-transparent to-theme-300" />
-                  </div>
-                  <p className="text-stone-300 text-sm md:text-base max-w-md mx-auto leading-relaxed mb-16 tracking-wide font-light">
-                    We would be absolutely thrilled to celebrate with you. Kindly respond by July.
-                  </p>
-
-                  {/* Premium RSVP Form */}
-                  <div className="w-full bg-white/5 backdrop-blur-md p-6 sm:p-8 md:p-12 rounded-[2rem] border border-white/10 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)]">
-                    <form className="space-y-8 text-left" onSubmit={handleRsvpSubmit}>
-                      <div className="space-y-3">
-                        <label className="text-[8px] md:text-[10px] uppercase tracking-[0.3em] font-bold text-theme-200 ml-2">Full Name</label>
-                        <input
-                          type="text"
-                          required
-                          value={rsvpData.name}
-                          onChange={(e) => setRsvpData({ ...rsvpData, name: e.target.value })}
-                          placeholder="John & Jane Doe"
-                          className="w-full bg-transparent border-b border-white/20 px-2 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-theme-300 transition-colors font-cinzel text-lg md:text-xl tracking-wide"
-                        />
-                      </div>
-
-                      <div className="space-y-3">
-                        <label className="text-[8px] md:text-[10px] uppercase tracking-[0.3em] font-bold text-theme-200 ml-2">Guests</label>
-                        <div className="relative">
-                          <select
-                            value={rsvpData.guests}
-                            onChange={(e) => setRsvpData({ ...rsvpData, guests: e.target.value })}
-                            className="w-full bg-transparent border-b border-white/20 px-2 py-3 text-white focus:outline-none focus:border-theme-300 transition-colors font-cinzel text-lg md:text-xl tracking-wide appearance-none cursor-pointer"
-                          >
-                            <option value="1" className="bg-[#2c2a26] text-white">1 Guest (Just Me)</option>
-                            <option value="2" className="bg-[#2c2a26] text-white">2 Guests</option>
-                            <option value="3" className="bg-[#2c2a26] text-white">3 Guests</option>
-                            <option value="4" className="bg-[#2c2a26] text-white">4 Guests</option>
-                            <option value="0" className="bg-[#2c2a26] text-theme-300">Regretfully Decline</option>
-                          </select>
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <div className="w-2 h-2 border-r border-b border-theme-300 rotate-45 transform -translate-y-[25%]" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <label className="text-[8px] md:text-[10px] uppercase tracking-[0.3em] font-bold text-theme-200 ml-2">Dietary Notes</label>
-                        <input
-                          type="text"
-                          value={rsvpData.notes}
-                          onChange={(e) => setRsvpData({ ...rsvpData, notes: e.target.value })}
-                          placeholder="Allergies, Vegan, etc."
-                          className="w-full bg-transparent border-b border-white/20 px-2 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-theme-300 transition-colors font-cinzel text-lg md:text-xl tracking-wide"
-                        />
-                      </div>
-
-                      <div className="pt-10">
-                        <button
-                          disabled={isRsvpSubmitting}
-                          className="w-full bg-theme-200 text-stone-900 py-5 rounded-full font-bold uppercase tracking-[0.3em] text-[10px] md:text-sm hover:bg-white hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all duration-300 group inline-flex justify-center items-center gap-4 disabled:opacity-50"
-                        >
-                          {isRsvpSubmitting ? (
-                            <span className="animate-pulse">Sending...</span>
-                          ) : (
-                            <>
-                              <span className="w-1.5 h-1.5 bg-stone-900 rotate-45 group-hover:scale-150 transition-transform" />
-                              Send RSVP
-                              <span className="w-1.5 h-1.5 bg-stone-900 rotate-45 group-hover:scale-150 transition-transform" />
-                            </>
-                          )}
-                        </button>
-                        {rsvpStatus === "success" && (
-                          <p className="mt-4 text-theme-200 text-xs font-bold text-center animate-bounce">Thank you! RSVP Sent Successfully.</p>
-                        )}
-                        {rsvpStatus === "error" && (
-                          <p className="mt-4 text-red-400 text-xs font-bold text-center">Something went wrong. Please try again.</p>
-                        )}
-                      </div>
-                    </form>
-                  </div>
-                </motion.div>
-              </div>
-            </section>
 
             {/* Wishing Section and Footer Wrapper */}
             <div className="relative bg-[#fdfaf5]">
@@ -1040,76 +861,14 @@ export default function WeddingInvitation() {
                     viewport={{ once: true }}
                     className="flex flex-col items-center"
                   >
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-theme-100/50 mb-8 mt-4 shadow-sm border border-theme-200/50">
-                      <Sparkles className="w-8 h-8 text-theme-500" />
-                    </div>
 
-                    <h2 className="font-playball text-[3.5rem] sm:text-[4rem] md:text-[5.5rem] text-theme-800 mb-6 drop-shadow-sm leading-none">Best Wishes</h2>
-                    <div className="h-px w-24 bg-gradient-to-r from-transparent via-theme-400 to-transparent mb-8" />
-
-                    <p className="text-stone-500 text-sm md:text-lg leading-relaxed max-w-xl mx-auto mb-16 font-light tracking-wide px-4">
-                      Your presence at our wedding is the greatest gift of all. However, if you wish to honor us with a message, we would be delighted to read it!
-                    </p>
-
-                    {/* Premium Wishing Form */}
-                    <div className="w-full max-w-2xl mx-auto bg-white p-6 sm:p-8 md:p-14 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-theme-100/50 rounded-tr-[4rem] rounded-bl-[4rem] relative group">
-                      {/* Decorative internal lines */}
-                      <div className="absolute inset-2 md:inset-4 border-[0.5px] border-theme-200/50 rounded-tr-[3.5rem] rounded-bl-[3.5rem] pointer-events-none transition-colors duration-700 group-hover:border-theme-300/80" />
-
-                      <form className="space-y-8 text-left relative z-10" onSubmit={handleWishSubmit}>
-                        <div className="space-y-3">
-                          <label className="text-[7px] md:text-[9px] uppercase tracking-[0.4em] font-bold text-stone-400 ml-2">Your Name</label>
-                          <input
-                            type="text"
-                            required
-                            value={wishData.name}
-                            onChange={(e) => setWishData({ ...wishData, name: e.target.value })}
-                            placeholder="John Doe"
-                            className="w-full bg-stone-50/50 border-b border-theme-200 px-4 py-4 text-theme-900 placeholder:text-stone-300 focus:outline-none focus:border-theme-400 focus:bg-white transition-all font-cinzel text-lg tracking-wide rounded-t-lg"
-                          />
-                        </div>
-                        <div className="space-y-3">
-                          <label className="text-[7px] md:text-[9px] uppercase tracking-[0.4em] font-bold text-stone-400 ml-2">Your Message</label>
-                          <textarea
-                            rows={4}
-                            required
-                            value={wishData.message}
-                            onChange={(e) => setWishData({ ...wishData, message: e.target.value })}
-                            placeholder="Wishing you a lifetime of happiness..."
-                            className="w-full bg-stone-50/50 border-b border-theme-200 px-4 py-4 text-theme-900 placeholder:text-stone-300 focus:outline-none focus:border-theme-400 focus:bg-white transition-all font-cinzel text-lg tracking-wide resize-none rounded-t-lg"
-                          />
-                        </div>
-                        <div className="pt-6 flex flex-col items-center gap-4">
-                          <button
-                            disabled={isWishSubmitting}
-                            className="bg-theme-800 text-white px-12 py-5 rounded-full font-bold uppercase tracking-[0.3em] text-[10px] hover:bg-theme-900 hover:shadow-xl hover:shadow-theme-900/20 transition-all duration-300 group/btn inline-flex items-center gap-4 disabled:opacity-50"
-                          >
-                            {isWishSubmitting ? (
-                              <span className="animate-pulse">Sending...</span>
-                            ) : (
-                              <>
-                                <span className="w-1.5 h-1.5 bg-white rotate-45 group-hover/btn:scale-150 transition-transform" />
-                                Send Wishes
-                                <span className="w-1.5 h-1.5 bg-white rotate-45 group-hover/btn:scale-150 transition-transform" />
-                              </>
-                            )}
-                          </button>
-                          {wishStatus === "success" && (
-                            <p className="text-theme-600 text-xs font-bold animate-bounce">Your message has been sent. Thank you!</p>
-                          )}
-                          {wishStatus === "error" && (
-                            <p className="text-red-500 text-xs font-bold">Failed to send. Please try again.</p>
-                          )}
-                        </div>
-                      </form>
-                    </div>
 
                     <div className="mt-32 md:mt-48 space-y-6 flex flex-col items-center relative w-full">
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-playball text-[22vw] md:text-[220px] text-theme-100/40 whitespace-nowrap pointer-events-none z-0 select-none">
                         Thank You
                       </div>
                       <p className="text-[9px] md:text-[11px] uppercase tracking-[0.8em] text-theme-600 font-bold relative z-10 bg-[#fdfaf5] px-6 py-2 rounded-full border border-theme-100/50 shadow-sm">With Love</p>
-                      <h3 className="font-playball text-[3.2rem] sm:text-6xl md:text-8xl text-theme-900 relative z-10 drop-shadow-sm px-4 pt-4 leading-none">Chamith & Sithumi</h3>
+                      <h3 className="font-playball text-[2.5rem] sm:text-4xl md:text-6xl text-theme-900 relative z-10 drop-shadow-sm px-4 pt-4 leading-tight text-center">Chamith Gamage<br className="md:hidden"/> & <br className="md:hidden"/>Sithumi Koralage</h3>
 
                       <motion.img
                         initial={{ opacity: 0, y: 24, scale: 0.95 }}
